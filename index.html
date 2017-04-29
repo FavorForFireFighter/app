@@ -26,10 +26,11 @@ body {
     integrity="sha512-A7vV8IFfih/D732iSSKi20u/ooOfj/AGehOKq0f4vLT1Zr2Y+RX7C+w8A1gaSasGtRUZpF/NZgzSAu4/Gc41Lg=="
     crossorigin="">
   </script>
-  <script src="lib/leaflet-heat.js"></script>
+  <script src="lib/heatmap.min.js"></script>
+  <script src="lib/leaflet-heatmap.js"></script>
   <script>
     // 地図作成
-    var map = L.map('mapid').setView([10, 100], 5);
+    var map = L.map('mapid').setView([20, 101], 8);
 
     // 一番下にmapbox表示
     L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token={accessToken}', {
@@ -40,17 +41,18 @@ body {
     }).addTo(map);
 
     // 地図の上にヒートマップを乗せる
+    var heatmapLayer = new HeatmapOverlay(cfg = {
+      radius: 0.01,
+      maxOpacity: 400,
+      minOpacity: 300,
+      scaleRadius: true,
+      useLocalExtrema: true,
+      gradient: { 0.1: '#900', 0.25: '#f96', 0.5: '#fd9', 0.75: '#ffd', 1: "white" }
+    }).addTo(map);
+
     $.getJSON("data/fire.json", function(data) {
-      L.heatLayer(
-        data,
-        {
-          radius: 5,
-          minOpacity:300,
-          max: 400,
-          gradient: {0.1: '#900', 0.25: '#f96', 0.5: '#fd9', 0.75: '#ffd', 1: 'white'}
-        }
-      ).addTo(map);
-    })
+      heatmapLayer.setData({"max": 400, "data": data});
+    });
   </script>
 </body>
 </html>
