@@ -21,6 +21,7 @@ body {
 </head>
 <body>
   <div id="mapid"></div>
+  <script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
   <script src="https://unpkg.com/leaflet@1.0.3/dist/leaflet.js"
     integrity="sha512-A7vV8IFfih/D732iSSKi20u/ooOfj/AGehOKq0f4vLT1Zr2Y+RX7C+w8A1gaSasGtRUZpF/NZgzSAu4/Gc41Lg=="
     crossorigin="">
@@ -28,7 +29,7 @@ body {
   <script src="lib/leaflet-heat.js"></script>
   <script>
     // 地図作成
-    var map = L.map('mapid').setView([34.7063, 135.501], 20);
+    var map = L.map('mapid').setView([10, 100], 5);
 
     // 一番下にmapbox表示
     L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token={accessToken}', {
@@ -39,19 +40,17 @@ body {
     }).addTo(map);
 
     // 地図の上にヒートマップを乗せる
-    var heat = L.heatLayer(
-      [
-        [34.7074, 135.5003, 37],
-        [34.7026, 135.5022, 34],
-        [34.7025, 135.5052, 41],
-        [34.7063, 135.501, 41]
-      ],
-      {
-        radius: 25,
-        max: 50,
-        gradient: {0.1: '#900', 0.25: '#f96', 0.5: '#fd9', 0.75: '#ffd', 1: 'white'}
-      }
-    ).addTo(map);
+    $.getJSON("data/fire.json", function(data) {
+      L.heatLayer(
+        data,
+        {
+          radius: 5,
+          minOpacity:300,
+          max: 400,
+          gradient: {0.1: '#900', 0.25: '#f96', 0.5: '#fd9', 0.75: '#ffd', 1: 'white'}
+        }
+      ).addTo(map);
+    })
   </script>
 </body>
 </html>
