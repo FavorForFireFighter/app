@@ -26,13 +26,18 @@ body {
     crossorigin="">
   </script>
   <script>
-    var mymap = L.map('mapid').setView([51.505, -0.09], 13);
+    // 地図作成
+    var mymap = L.map('mapid').setView([34.7063, 135.501], 20);
+
+    // 一番下にmapbox表示
     L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token={accessToken}', {
         attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="http://mapbox.com">Mapbox</a>',
-        maxZoom: 18,
+        maxZoom: 20,
         id: 'mapbox.emerald',
         accessToken: 'pk.eyJ1IjoidW9rdW11cmEiLCJhIjoiY2oyMzl1eGd5MDAwdjMzbGxwNGZoaWplaCJ9.PKXmdbEBSwShnDD3ZIMKkw'
     }).addTo(mymap);
+
+    
   </script>
 </body>
 </html>
