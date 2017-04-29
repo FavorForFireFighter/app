@@ -25,9 +25,10 @@ body {
     integrity="sha512-A7vV8IFfih/D732iSSKi20u/ooOfj/AGehOKq0f4vLT1Zr2Y+RX7C+w8A1gaSasGtRUZpF/NZgzSAu4/Gc41Lg=="
     crossorigin="">
   </script>
+  <script src="lib/leaflet-heat.js"></script>
   <script>
     // 地図作成
-    var mymap = L.map('mapid').setView([34.7063, 135.501], 20);
+    var map = L.map('mapid').setView([34.7063, 135.501], 20);
 
     // 一番下にmapbox表示
     L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token={accessToken}', {
@@ -35,9 +36,22 @@ body {
         maxZoom: 20,
         id: 'mapbox.emerald',
         accessToken: 'pk.eyJ1IjoidW9rdW11cmEiLCJhIjoiY2oyMzl1eGd5MDAwdjMzbGxwNGZoaWplaCJ9.PKXmdbEBSwShnDD3ZIMKkw'
-    }).addTo(mymap);
+    }).addTo(map);
 
-    
+    // 地図の上にヒートマップを乗せる
+    var heat = L.heatLayer(
+      [
+        [34.7074, 135.5003, 37],
+        [34.7026, 135.5022, 34],
+        [34.7025, 135.5052, 41],
+        [34.7063, 135.501, 41]
+      ],
+      {
+        radius: 25,
+        max: 50,
+        gradient: {0.1: '#900', 0.25: '#f96', 0.5: '#fd9', 0.75: '#ffd', 1: 'white'}
+      }
+    ).addTo(map);
   </script>
 </body>
 </html>
