@@ -90,7 +90,8 @@
               var pos = map.latLngToLayerPoint(new L.LatLng(fire.lat, fire.lng));
               var interval = fire.value > 400 ? 10 : fire.value > 300 ? 4000 - fire.value*10 : 1000
 
-              var rect = {left:pos.x-2, top: pos.y-2, right:pos.x + 2, bottom:pos.y+2}
+              var size = 10;
+              var rect = {left:pos.x-size, top: pos.y-size, right:pos.x + size, bottom:pos.y+size}
 
               // 風速: ダミー
               var v = {x:20, y:50}
@@ -116,8 +117,9 @@
       var circle = svgLayer.append("circle")
         .attr("cx", x)
         .attr("cy", y)
-        .attr("r", 1)
-        .attr("fill", "#fd9")
+        .attr("r", 2)
+        .attr("fill", "#ffb")
+        .attr("stroke", "#fb9")
         .attr("class", "particle");
 
       circle.transition()
