@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html>
+<html class="fill">
 <head>
   <title>Favor for Fire Fighter</title>
   <meta charset="utf-8">
@@ -7,20 +7,16 @@
     integrity="sha512-07I2e+7D8p6he1SIM+1twR5TIrhUQn9+I6yjqD53JQjFiMf8EtC93ty0/5vJTZGF8aAocvHYNEDJajGdNx1IsQ=="
     crossorigin=""/>
 <style>
-html {
-    height: 100%;
-}
-body {
-    height: 100%;
-    margin: 0;
-}
-#mapid {
+.fill {
+  margin: 0;
+  padding: 0;
+  width: 100%;
   height: 100%;
 }
 </style>
 </head>
-<body>
-  <div id="mapid"></div>
+<body class="fill">
+  <div id="mapid" class="fill"></div>
   <script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
   <script src="https://unpkg.com/leaflet@1.0.3/dist/leaflet.js"
     integrity="sha512-A7vV8IFfih/D732iSSKi20u/ooOfj/AGehOKq0f4vLT1Zr2Y+RX7C+w8A1gaSasGtRUZpF/NZgzSAu4/Gc41Lg=="
@@ -28,6 +24,20 @@ body {
   </script>
   <script src="lib/heatmap.min.js"></script>
   <script src="lib/leaflet-heatmap.js"></script>
+
+  <!-- D3たち -->
+  <script src="https://d3js.org/d3.v3.min.js"></script>
+  <script src="https://d3js.org/d3-array.v1.min.js"></script>
+  <script src="https://d3js.org/d3-random.v1.min.js"></script>
+  <script src="https://d3js.org/d3-path.v1.min.js"></script>
+  <script src="https://d3js.org/d3-shape.v1.min.js"></script>
+  <script src="https://d3js.org/d3-color.v1.min.js"></script>
+  <script src="https://d3js.org/d3-dispatch.v1.min.js"></script>
+  <script src="https://d3js.org/d3-ease.v1.min.js"></script>
+  <script src="https://d3js.org/d3-interpolate.v1.min.js"></script>
+  <script src="https://d3js.org/d3-selection.v1.min.js"></script>
+  <script src="https://d3js.org/d3-timer.v1.min.js"></script>
+  <script src="https://d3js.org/d3-transition.v1.min.js"></script>
   <script>
     // 地図作成
     var map = L.map('mapid').setView([20, 101], 8);
@@ -43,6 +53,7 @@ body {
 
     // ヒートマップを乗せてデータ読み込み
     createHeatmapLayerInto(map).loadData("data/fire.json");
+    createWindLayerInto(map).loadData('data/wind.json');
 
     function createHeatmapLayerInto(map) {
       var heatmapLayer = new HeatmapOverlay(cfg = {
@@ -62,7 +73,54 @@ body {
           });
         }
       };
+    };
+
+    function createWindLayerInto(map) {
+      var svgLayer = d3.select(map.getPanes().overlayPane).append('svg');
+      svgLayer.attr('class', 'leaflet-zoom-hide fill');
+      var plotLayer = svgLayer.append('g');
+
+      return {
+        svgLayer: svgLayer,
+        plotLayer: plotLayer,
+        loadData: function(path) {
+          // ひとまず、データを無視してランダムに
+          var rect = {x:0, y:0, width:100, height:100}
+          var v = {x:20, y:50}
+
+          setInterval(
+            function() {
+              putParticle(svgLayer,
+                d3.randomUniform(rect.x, rect.width),
+                d3.randomUniform(rect.y, rect.height),
+                v.x, v.y
+              );
+            },
+            10
+          )
+
+        }
+      }
+
     }
+
+    function putParticle(svgLayer, x, y, vx, vy) {
+
+      var circle = svgLayer.append("circle")
+        .attr("cx", x)
+        .attr("cy", y)
+        .attr("r", 1)
+        .attr("fill", "#69f")
+        .attr("class", "particle");
+
+      circle.transition()
+        .duration(1000)
+        .ease(d3.easeLinear)
+        .attr("transform", "translate(" + vx + "," + vy + ")")
+        .on('end', function () {
+          d3.select(this).remove();
+        });
+      }
 
   </script>
 </body>
