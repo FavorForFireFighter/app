@@ -80,25 +80,10 @@
       svgLayer.attr('class', 'leaflet-zoom-hide fill');
       var plotLayer = svgLayer.append('g');
 
-      var timers = []
-
       return {
         svgLayer: svgLayer,
         plotLayer: plotLayer,
         loadData: function(fireData, windData) {
-          function reset() {
-            timers.forEach(function(timer) { clearInterval(timer); });
-            timers = [];
-            this.loadData(fireData, windData);
-          }
-
-          map.on("zoomend", function() {
-            this.reset();
-          });
-          map.on("moveend", function() {
-            this.reset();
-          });
-
           $.getJSON(windData, function(wind) {
             $.getJSON(fireData, function(data) {
               data.forEach(function(fire) {
@@ -116,7 +101,7 @@
                   y:Math.sin(windDir * Math.PI / 180)*50
                 };
 
-                timers.push(setInterval(
+                setInterval(
                   function() {
                     putParticle(svgLayer,
                       d3.randomUniform(rect.left, rect.right),
@@ -125,7 +110,7 @@
                     );
                   },
                   interval
-                ));
+                )
               });
             });
           });
