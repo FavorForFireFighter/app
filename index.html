@@ -41,19 +41,29 @@ body {
         accessToken: 'pk.eyJ1IjoidW9rdW11cmEiLCJhIjoiY2oyMzl1eGd5MDAwdjMzbGxwNGZoaWplaCJ9.PKXmdbEBSwShnDD3ZIMKkw'
     }).addTo(map);
 
-    // 地図の上にヒートマップを乗せる
-    var heatmapLayer = new HeatmapOverlay(cfg = {
-      radius: 0.01,
-      maxOpacity: 400,
-      minOpacity: 300,
-      scaleRadius: true,
-      useLocalExtrema: true,
-      gradient: { 0.1: '#900', 0.25: '#f96', 0.5: '#fd9', 0.75: '#ffd', 1: "white" }
-    }).addTo(map);
+    // ヒートマップを乗せてデータ読み込み
+    createHeatmapLayerInto(map).loadData("data/fire.json");
 
-    $.getJSON("data/fire.json", function(data) {
-      heatmapLayer.setData({"max": 400, "data": data});
-    });
+    function createHeatmapLayerInto(map) {
+      var heatmapLayer = new HeatmapOverlay(cfg = {
+        radius: 0.01,
+        maxOpacity: 400,
+        minOpacity: 300,
+        scaleRadius: true,
+        useLocalExtrema: true,
+        gradient: { 0.1: '#900', 0.25: '#f96', 0.5: '#fd9', 0.75: '#ffd', 1: "white" }
+      }).addTo(map);
+
+      return {
+        heatmapLayer: heatmapLayer,
+        loadData: function(path) {
+          $.getJSON(path, function(data) {
+            heatmapLayer.setData({"max": 400, "data": data});
+          });
+        }
+      };
+    }
+
   </script>
 </body>
 </html>
