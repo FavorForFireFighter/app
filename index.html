@@ -86,17 +86,18 @@
         svgLayer: svgLayer,
         plotLayer: plotLayer,
         loadData: function(fireData, windData) {
+          var self = this;
           function reset() {
             timers.forEach(function(timer) { clearInterval(timer); });
             timers = [];
-            this.loadData(fireData, windData);
+            self.loadData(fireData, windData);
           }
 
           map.on("zoomend", function() {
-            this.reset();
+            reset();
           });
           map.on("moveend", function() {
-            this.reset();
+            reset();
           });
 
           $.getJSON(windData, function(wind) {
