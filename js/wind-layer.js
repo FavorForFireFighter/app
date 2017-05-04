@@ -70,6 +70,7 @@ function createWindLayerInto(map) {
   });
 
   function loadData(fireData, windData) {
+    reset();
 
     var bounds = map.getBounds();
     var northWest = bounds.getNorthWest();
