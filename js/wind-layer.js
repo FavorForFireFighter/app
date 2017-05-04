@@ -3,7 +3,9 @@ function createWindLayerInto(map) {
   svgLayer.attr('class', 'leaflet-zoom-hide fill');
   var plotLayer = svgLayer.append('g');
 
-  function putParticle(svgLayer, x, y, vx, vy) {
+  function putParticle(svgLayer, rect, v) {
+    var x = d3.randomUniform(rect.left, rect.right);
+    var y = d3.randomUniform(rect.top, rect.bottom);
 
     var circle = plotLayer.append("circle")
       .attr("cx", x)
@@ -13,10 +15,12 @@ function createWindLayerInto(map) {
       .attr("stroke", "#fb9")
       .attr("class", "particle");
 
+    var translate = "translate(" + Math.round(v.x) + "," + Math.round(v.y) + ")";
+
     circle.transition()
       .duration(1000)
       .ease(d3.easeLinear)
-      .attr("transform", "translate(" + vx + "," + vy + ")")
+      .attr("transform", translate)
       .on('end', function () {
         d3.select(this).remove();
       });
@@ -54,6 +58,10 @@ function createWindLayerInto(map) {
 
   function loadData(fireData, windData) {
 
+    var bounds = map.getBounds();
+    var northWest = bounds.getNorthWest();
+    var southEast = bounds.getSouthEast();
+
     reset = function() {
       clearTimer();
       fitLayer();
@@ -63,27 +71,29 @@ function createWindLayerInto(map) {
     $.getJSON(windData, function(wind) {
       $.getJSON(fireData, function(data) {
         data.forEach(function(fire) {
+          if (northWest.lat < fire.lat || fire.lat < southEast.lat) {
+            return;
+          }
+          if ( fire.lng < northWest.lng || southEast.lng < fire.lng) {
+            return;
+          }
+
           var pos = map.latLngToLayerPoint(new L.LatLng(fire.lat, fire.lng));
           var interval = fire.value > 400 ? 1000 : fire.value > 300 ? 5000 - fire.value*10 : 2000
 
-
-          var size = 10;
+          var size = 5;
           var rect = {left:pos.x-size, top: pos.y-size, right:pos.x + size, bottom:pos.y+size}
 
           // 風速: ダミー
-          var windDir = wind[0].data[(90-Math.round(fire.lat))*360 + Math.round(fire.lng)];
+console.log(fire.lat + ", " + fire.lng)
+          var pos = (90-Math.round(fire.lat))*360 + Math.round(fire.lng)
           var v = {
-            x:Math.cos(windDir * Math.PI / 180)*50,
-            y:Math.sin(windDir * Math.PI / 180)*50
+            x: wind[0].data[pos] * 5,
+            y: -wind[1].data[pos] * 5 
           };
-
           timers.push(setInterval(
             function() {
-              putParticle(svgLayer,
-                d3.randomUniform(rect.left, rect.right),
-                d3.randomUniform(rect.top, rect.bottom),
-                v.x, v.y
-              );
+              putParticle(svgLayer, rect, v);
             },
             interval
           ));
