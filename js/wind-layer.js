@@ -6,9 +6,10 @@ function createWindLayerInto(map) {
   function putParticle(svgLayer, fire, wind) {
 
     var index = (90-Math.round(fire.lat))*360 + Math.round(fire.lng)
+    const speed = map.getZoom()^2;
     var v = {
-      x: wind[0].data[index] * 10,
-      y: -wind[1].data[index] * 10
+      x: wind[0].data[index] * speed,
+      y: -wind[1].data[index] * speed
     };
 
     var size = 5;
