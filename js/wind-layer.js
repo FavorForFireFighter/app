@@ -5,7 +5,7 @@ function createWindLayerInto(map) {
 
   function putParticle(svgLayer, x, y, vx, vy) {
 
-    var circle = svgLayer.append("circle")
+    var circle = plotLayer.append("circle")
       .attr("cx", x)
       .attr("cy", y)
       .attr("r", 2)
@@ -30,7 +30,7 @@ function createWindLayerInto(map) {
         $.getJSON(fireData, function(data) {
           data.forEach(function(fire) {
             var pos = map.latLngToLayerPoint(new L.LatLng(fire.lat, fire.lng));
-            var interval = fire.value > 400 ? 10 : fire.value > 300 ? 4000 - fire.value*10 : 1000
+            var interval = fire.value > 400 ? 1000 : fire.value > 300 ? 5000 - fire.value*10 : 2000
 
 
             var size = 10;
