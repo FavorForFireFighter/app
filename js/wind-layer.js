@@ -3,9 +3,18 @@ function createWindLayerInto(map) {
   svgLayer.attr('class', 'leaflet-zoom-hide fill');
   var plotLayer = svgLayer.append('g');
 
-  function putParticle(svgLayer, rect, v) {
-    var x = d3.randomUniform(rect.left, rect.right);
-    var y = d3.randomUniform(rect.top, rect.bottom);
+  function putParticle(svgLayer, fire, wind) {
+
+    var index = (90-Math.round(fire.lat))*360 + Math.round(fire.lng)
+    var v = {
+      x: wind[0].data[index] * 10,
+      y: -wind[1].data[index] * 10
+    };
+
+    var size = 5;
+    var firePos = map.latLngToLayerPoint(new L.LatLng(fire.lat, fire.lng));
+    var x = d3.randomUniform(firePos.x-size, firePos.x+size);
+    var y = d3.randomUniform(firePos.y-size, firePos.y+size);
 
     var circle = plotLayer.append("circle")
       .attr("cx", x)
@@ -18,7 +27,7 @@ function createWindLayerInto(map) {
     var translate = "translate(" + Math.round(v.x) + "," + Math.round(v.y) + ")";
 
     circle.transition()
-      .duration(1000)
+      .duration(d3.randomUniform(500, 1500))
       .ease(d3.easeLinear)
       .attr("transform", translate)
       .on('end', function () {
@@ -78,22 +87,11 @@ function createWindLayerInto(map) {
             return;
           }
 
-          var pos = map.latLngToLayerPoint(new L.LatLng(fire.lat, fire.lng));
           var interval = fire.value > 400 ? 1000 : fire.value > 300 ? 5000 - fire.value*10 : 2000
 
-          var size = 5;
-          var rect = {left:pos.x-size, top: pos.y-size, right:pos.x + size, bottom:pos.y+size}
-
-          // 風速: ダミー
-console.log(fire.lat + ", " + fire.lng)
-          var pos = (90-Math.round(fire.lat))*360 + Math.round(fire.lng)
-          var v = {
-            x: wind[0].data[pos] * 5,
-            y: -wind[1].data[pos] * 5 
-          };
           timers.push(setInterval(
             function() {
-              putParticle(svgLayer, rect, v);
+              putParticle(svgLayer, fire, wind);
             },
             interval
           ));
