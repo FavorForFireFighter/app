@@ -29,34 +29,36 @@ function createWindLayerInto(map) {
     timers = [];
   }
 
-    function fitLayer() {
-      var bounds = map.getBounds();
-      var topLeft = map.latLngToLayerPoint(bounds.getNorthWest());
-      var bottomRight = map.latLngToLayerPoint(bounds.getSouthEast());
+  function fitLayer() {
+    var bounds = map.getBounds();
+    var topLeft = map.latLngToLayerPoint(bounds.getNorthWest());
+    var bottomRight = map.latLngToLayerPoint(bounds.getSouthEast());
 
-      svgLayer.attr("width", bottomRight.x - topLeft.x)
-        .attr("height", bottomRight.y - topLeft.y)
-        .style("left", topLeft.x + "px")
-        .style("top", topLeft.y + "px");
+    svgLayer.attr("width", bottomRight.x - topLeft.x)
+      .attr("height", bottomRight.y - topLeft.y)
+      .style("left", topLeft.x + "px")
+      .style("top", topLeft.y + "px");
 
-      plotLayer.attr('transform', 'translate('+ -topLeft.x + ',' + -topLeft.y + ')');
-    }
+    plotLayer.attr('transform', 'translate('+ -topLeft.x + ',' + -topLeft.y + ')');
+  }
+
+  var reset = function() {}
+
+  map.on("zoom", function() {
+    reset();
+  });
+
+  map.on("moveend", function() {
+    reset();
+  });
 
   function loadData(fireData, windData) {
 
-    function reset() {
+    reset = function() {
       clearTimer();
       fitLayer();
       loadData(fireData, windData);
     }
-
-    map.on("zoom", function() {
-      reset();
-    });
-
-    map.on("moveend", function() {
-      reset();
-    });
 
     $.getJSON(windData, function(wind) {
       $.getJSON(fireData, function(data) {
