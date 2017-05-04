@@ -22,8 +22,6 @@
     integrity="sha512-A7vV8IFfih/D732iSSKi20u/ooOfj/AGehOKq0f4vLT1Zr2Y+RX7C+w8A1gaSasGtRUZpF/NZgzSAu4/Gc41Lg=="
     crossorigin="">
   </script>
-  <script src="lib/heatmap.min.js"></script>
-  <script src="lib/leaflet-heatmap.js"></script>
 
   <!-- D3たち -->
   <script src="https://d3js.org/d3.v3.min.js"></script>
@@ -38,6 +36,12 @@
   <script src="https://d3js.org/d3-selection.v1.min.js"></script>
   <script src="https://d3js.org/d3-timer.v1.min.js"></script>
   <script src="https://d3js.org/d3-transition.v1.min.js"></script>
+
+  <script src="lib/heatmap.min.js"></script>
+  <script src="lib/leaflet-heatmap.js"></script>
+
+  <script src="js/heatmap-layer.js"></script>
+  <script src="js/wind-layer.js"></script>
   <script>
     // 地図作成
     var map = L.map('mapid').setView([20, 101], 8);
@@ -54,89 +58,6 @@
     // ヒートマップを乗せてデータ読み込み
     createHeatmapLayerInto(map).loadData("data/fire.json");
     createWindLayerInto(map).loadData('data/fire.json', "data/wind.json");
-
-    function createHeatmapLayerInto(map) {
-      var heatmapLayer = new HeatmapOverlay(cfg = {
-        radius: 0.01,
-        maxOpacity: 400,
-        minOpacity: 300,
-        scaleRadius: true,
-        useLocalExtrema: true,
-        gradient: { 0.1: '#900', 0.25: '#f96', 0.5: '#fd9', 0.75: '#ffd', 1: "white" }
-      }).addTo(map);
-
-      return {
-        heatmapLayer: heatmapLayer,
-        loadData: function(path) {
-          $.getJSON(path, function(data) {
-            heatmapLayer.setData({"max": 400, "data": data});
-          });
-        }
-      };
-    };
-
-    function createWindLayerInto(map) {
-      var svgLayer = d3.select(map.getPanes().overlayPane).append('svg');
-      svgLayer.attr('class', 'leaflet-zoom-hide fill');
-      var plotLayer = svgLayer.append('g');
-
-      return {
-        svgLayer: svgLayer,
-        plotLayer: plotLayer,
-        loadData: function(fireData, windData) {
-          $.getJSON(windData, function(wind) {
-            $.getJSON(fireData, function(data) {
-              data.forEach(function(fire) {
-                var pos = map.latLngToLayerPoint(new L.LatLng(fire.lat, fire.lng));
-                var interval = fire.value > 400 ? 10 : fire.value > 300 ? 4000 - fire.value*10 : 1000
-
-
-                var size = 10;
-                var rect = {left:pos.x-size, top: pos.y-size, right:pos.x + size, bottom:pos.y+size}
-
-                // 風速: ダミー
-                var windDir = wind[0].data[(90-Math.round(fire.lat))*360 + Math.round(fire.lng)];
-                var v = {
-                  x:Math.cos(windDir * Math.PI / 180)*50,
-                  y:Math.sin(windDir * Math.PI / 180)*50
-                };
-
-                setInterval(
-                  function() {
-                    putParticle(svgLayer,
-                      d3.randomUniform(rect.left, rect.right),
-                      d3.randomUniform(rect.top, rect.bottom),
-                      v.x, v.y
-                    );
-                  },
-                  interval
-                )
-              });
-            });
-          });
-        }
-      }
-    }
-
-    function putParticle(svgLayer, x, y, vx, vy) {
-
-      var circle = svgLayer.append("circle")
-        .attr("cx", x)
-        .attr("cy", y)
-        .attr("r", 2)
-        .attr("fill", "#ffb")
-        .attr("stroke", "#fb9")
-        .attr("class", "particle");
-
-      circle.transition()
-        .duration(1000)
-        .ease(d3.easeLinear)
-        .attr("transform", "translate(" + vx + "," + vy + ")")
-        .on('end', function () {
-          d3.select(this).remove();
-        });
-      }
-
   </script>
 </body>
 </html>
